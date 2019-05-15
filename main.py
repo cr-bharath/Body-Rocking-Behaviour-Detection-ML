@@ -5,6 +5,7 @@ from sklearn.linear_model import SGDClassifier
 from sklearn.model_selection import GridSearchCV, StratifiedKFold
 from sklearn.preprocessing import StandardScaler
 from sklearn.impute import SimpleImputer
+import pickle
 
 MAIN_DIRECTORY = os.getcwd()
 
@@ -84,8 +85,10 @@ def main():
         cv = 5
     # Hyperparameter Tuning
     clf = GridSearchCV(model, parameters, verbose=1, cv=cv)
+    # Save the model
+    pickle.dump(clf,open("brb_detector_clf.pkl","wb"))
     
-    # Testin Scores
+    # Testing Scores
     score = clf.score(x_test, y_test)
     print(clf.best_estimator_)
     print("Score: " + str(score))
