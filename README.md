@@ -17,7 +17,7 @@ You can pip install all the dependencies for the project.
 
 1. Download the dataset [here]()
 2. Run extractFeatures_stride.m with updated stride and window size (by default uses stride of 50 and window size of 200) in Matlab to perform feature extraction from training data. Features.csv should now be generated in each Session folder. 
-3. Run main.py for (python dev) or project3a.pynb (jupyter notebook) to perform hyperparameter tuning to find the best model
+3. Run main.py to perform hyperparameter tuning to find the best model
 
 ## Authors
 
