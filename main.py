@@ -6,11 +6,12 @@ from sklearn.model_selection import GridSearchCV, StratifiedKFold
 from sklearn.preprocessing import StandardScaler
 from sklearn.impute import SimpleImputer
 
+MAIN_DIRECTORY = os.getcwd()
 
 def load_data():
     """Function to load the training and test data"""
     stack_empty = 0
-    path = os.getcwd() + '/training_data/'
+    path =  MAIN_DIRECTORY + '/training_data/'
     # Training Data folders
     folders = ['Session01', 'Session05', 'Session06', 'Session07', 'Session12']
     length = len(folders)
@@ -20,8 +21,6 @@ def load_data():
         os.chdir(new_directory)
         timestamp = np.loadtxt(open('time.txt', 'r'), delimiter=',')
         features = np.loadtxt(open('features.csv', 'r'), delimiter=',')
-        indices = np.argwhere(np.isnan(features))
-        features[indices] = 0
         detections = np.int32(np.loadtxt(open('detection.txt', 'r'), delimiter=','))
         if stack_empty == 0:
             x_train = features
@@ -33,52 +32,12 @@ def load_data():
             time_stack = np.hstack((time_stack, timestamp))
             y_train = np.hstack((y_train, detections))
 
-    # Load the testing data
+    # Load the testing data , using one of the training Sessions as testing for now
     new_directory = path + 'Session13'
     os.chdir(new_directory)
     x_test = np.loadtxt(open('features.csv', 'r'), delimiter=',')
     y_test = np.int32(np.loadtxt(open('detection.txt', 'r'), delimiter=','))
     return x_train, y_train, x_test, y_test
-
-
-def load_data2():
-    """Function to load the training and test data"""
-    stack_empty = 0
-    path = os.getcwd() + '/training_data'
-    os.chdir(path)
-    # Training Data folders
-    feature_csvs = glob.glob('*_features.csv')
-    detections_csvs = glob.glob('*_detections.csv')
-    print(feature_csvs, detections_csvs)
-    # length = len(folders)
-    for file in feature_csvs:
-        print('Loading data from ' + file)
-        # new_directory = path + folder
-        # os.chdir(new_directory)
-        # timestamp = np.loadtxt(open('time.txt', 'r'), delimiter=',')
-        features = np.loadtxt(open(file, 'r'), delimiter=',')
-        # indices = np.argwhere(np.isnan(features))
-        # features[indices] = 0
-        detections = np.int32(np.loadtxt(open(detections_csvs[feature_csvs.index(file)], 'r'), delimiter=','))
-        if stack_empty == 0:
-            x_train = features
-            # time_stack = timestamp
-            y_train = detections
-            stack_empty = 1
-        else:
-            x_train = np.vstack((x_train, features))
-            # time_stack = np.hstack((time_stack, timestamp))
-            y_train = np.hstack((y_train, detections))
-
-    # Load the testing data
-    new_directory = path + '/Session13'
-    os.chdir(new_directory)
-    x_test = np.loadtxt(open('features.csv', 'r'), delimiter=',')
-    y_test = np.int32(np.loadtxt(open('detection.txt', 'r'), delimiter=','))
-    x_test = x_test[200:, :]
-    y_test = y_test[200:]
-    return x_train, y_train, x_test, y_test
-
 
 def remove_nan(x):
     """Function to replace missing values from dataset"""
@@ -98,8 +57,12 @@ def data_preprocessing(x_train, x_test):
 
 
 def main():
+    # Enable if you want to remove NaNs from and perform standardization over training and test data
     preprocessing = 1
+    # Enable if you want to use stratified folds for cross-validation
     stratified_fold = 1
+    
+    # Load Data
     x_train, y_train, x_test, y_test = load_data()
 
     if preprocessing:
@@ -107,27 +70,25 @@ def main():
         x_test = remove_nan(x_test)
         x_train, x_test = data_preprocessing(x_train, x_test)
 
-    # model = linear_model.SGDClassifier(max_iter=500,tol=1e-03)
-    # model.fit(x_train,y_train)
-    # score = model.score(x_test,y_test)
+    # Parameters over which hyperparameter will be performed
     parameters = {'alpha': (0.1, 0.01, 0.001, 0.0001),
                   'loss': ('log', 'hinge'),
                   'tol': (1e-3, 1e-4, 1e-5)
                   }
+    # Define the model
     model = SGDClassifier(penalty='l2', max_iter=1000, learning_rate='optimal',
                           eta0=0.001, shuffle=True)
-    # model.fit(x_train,y_train)
     if stratified_fold:
         cv = StratifiedKFold(n_splits=5)
     else:
         cv = 5
+    # Hyperparameter Tuning
     clf = GridSearchCV(model, parameters, verbose=1, cv=cv)
-    #results = clf.fit(x_train, y_train)
+    
+    # Testin Scores
     score = clf.score(x_test, y_test)
-
     print(clf.best_estimator_)
-
-    print(score)
+    print("Score: " + str(score))
 
 
 if __name__ == '__main__':
