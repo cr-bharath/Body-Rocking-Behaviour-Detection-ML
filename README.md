@@ -4,10 +4,10 @@ A project to identify and train a classical Machine Learning method for Body Roc
 
 ### Prerequisites
 
-python 3.6
-numpy
-scikit-learn
-Matlab R2018b
+1.python 3.6
+2.numpy
+3.scikit-learn
+4.Matlab R2018b
 
 ### Installing
 
