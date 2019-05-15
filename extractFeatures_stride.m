@@ -23,8 +23,8 @@ wristData = fscanf(wristFile,formatSpec_imu,sizeA_imu);
 armData = fscanf(armFile,formatSpec_imu,sizeA_imu);
 
 %Pad N-1 zeros at the beginning
-wristData_padded = [zeros(6,N-1) wristData];
-armData_padded = [zeros(6,N-1) armData];
+%wristData_padded = [zeros(6,N-1) wristData];
+%armData_padded = [zeros(6,N-1) armData];
 tot_length = length(wristData);
 feature_length = round(((tot_length-N)/stride)+1) - 1;
 features = zeros(feature_length,84);
