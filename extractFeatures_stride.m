@@ -13,9 +13,9 @@ sessions = ["Session01","Session05","Session06","Session07","Session12"];
 num_folders = length(sessions);
 
 for folder = 1 : num_folders    
-wristFile = fopen(sessions(folder) +'/wristIMU.txt','r');
-armFile = fopen(sessions(folder) +'/armIMU.txt','r');
-detectionFile = fopen(sessions(folder) +'/detection.txt','r');
+wristFile = fopen('training_data/'+ sessions(folder) +'/wristIMU.txt','r');
+armFile = fopen('training_data/'+ sessions(folder) +'/armIMU.txt','r');
+detectionFile = fopen('training_data/'+ sessions(folder) +'/detection.txt','r');
 
 %Read data from wristIMU and armIMU files
 detections = fscanf(detectionFile,formatSpec_det); 
@@ -23,8 +23,8 @@ wristData = fscanf(wristFile,formatSpec_imu,sizeA_imu);
 armData = fscanf(armFile,formatSpec_imu,sizeA_imu);
 
 %Pad N-1 zeros at the beginning
-%wristData_padded = [zeros(6,N-1) wristData];
-%armData_padded = [zeros(6,N-1) armData];
+wristData_padded = [zeros(6,N-1) wristData];
+armData_padded = [zeros(6,N-1) armData];
 tot_length = length(wristData);
 feature_length = round(((tot_length-N)/stride)+1) - 1;
 features = zeros(feature_length,84);
@@ -48,10 +48,6 @@ for i = 0:feature_length -1
     
 end
 %Write the whole features into csv file
-csvwrite(sessions(folder)+'_features.csv',features);
-csvwrite(sessions(folder)+'_detections.csv',detections_new);
-
-
-
-
+csvwrite('training_data/'+ sessions(folder)+'_features.csv',features);
+csvwrite('training_data/'+ sessions(folder)+'_detections.csv',detections_new);
 end
